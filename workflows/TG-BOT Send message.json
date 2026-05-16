@@ -1,0 +1,354 @@
+{
+  "name": "TG-BOT Send message",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// items — все строки таблицы\n// Ищем первую строку, которая полностью не обработана:\n// TEST# есть, ACTUAL_RESULT пустой, SENDED пустой\n\nconst nextToSend = items.find(item =>\n    item.json['TEST#'] &&\n    !item.json.ACTUAL_RESULT &&\n    !item.json.SENDED\n);\n\n// Ищем строку, где SENDED уже есть, а ACTUAL_RESULT нет\nconst waitingForResult = items.find(item =>\n    item.json['TEST#'] &&\n    !item.json.ACTUAL_RESULT &&\n    item.json.SENDED\n);\n\n// Если есть строка, которая уже отправлена, но без результата — СТОП\nif (waitingForResult) {\n    return []; // не отправляем НИЧЕГО\n}\n\n// Если есть строка, которую нужно отправить — отправляем\nif (nextToSend) {\n    return [ nextToSend ];\n}\n\n// Иначе — ничего не делаем\nreturn [];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "cc09922d-ac07-4362-8d92-34a28260d72e",
+      "name": "Get new message"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "17TWo3sVU8EYnVHxydD-crZQ-6dIwYhdtPM2CsuRvFmI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "TEST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17TWo3sVU8EYnVHxydD-crZQ-6dIwYhdtPM2CsuRvFmI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        0
+      ],
+      "id": "9c8cc338-6d8d-44b8-a6f1-7d69524982e4",
+      "name": "Read Test Data Teble",
+      "credentials": {
+        "googleApi": {
+          "id": "Uj7jHv5GKpDrpobU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Берём первую доступную строку (как мы фильтровали ранее)\nconst testItem = items[0]; \n\nreturn [\n  {\n    json: {\n      message: testItem.json.MESSAGE  // берём MESSAGE из таблицы\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        0
+      ],
+      "id": "fa44c9cb-f0e0-4e93-b7f3-455a1a8c8665",
+      "name": "Extract text"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:5000/send_message",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": \"{{ $json.BOT_SENDERID }}\",\n  \"message\": \"{{ $('Get new message').item.json.MESSAGE }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "2e120d54-968e-4c90-9516-e38b13aea054",
+      "name": "Send To Bot"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst kievTime = now.toLocaleString(\"uk-UA\", { timeZone: \"Europe/Kiev\" });\n\nreturn [\n  {\n    json: {\n      SENDED: kievTime\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "49f4af7a-937c-4bac-950c-0928c32eb46f",
+      "name": "Add SENDED"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "17TWo3sVU8EYnVHxydD-crZQ-6dIwYhdtPM2CsuRvFmI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "TEST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17TWo3sVU8EYnVHxydD-crZQ-6dIwYhdtPM2CsuRvFmI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SENDED": "={{ $json.SENDED }}",
+            "TEST#": "={{ $('Get new message').first().json['TEST#'] }}"
+          },
+          "matchingColumns": [
+            "TEST#"
+          ],
+          "schema": [
+            {
+              "id": "TEST#",
+              "displayName": "TEST#",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TYPE",
+              "displayName": "TYPE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "MESSAGE",
+              "displayName": "MESSAGE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ACTUAL_RESULT",
+              "displayName": "ACTUAL_RESULT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "SENDED",
+              "displayName": "SENDED",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "RESULT",
+              "displayName": "RESULT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "cd827a33-d710-47d1-aeed-3b868ddcec16",
+      "name": "Update Test Data Table",
+      "credentials": {
+        "googleApi": {
+          "id": "Uj7jHv5GKpDrpobU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "17TWo3sVU8EYnVHxydD-crZQ-6dIwYhdtPM2CsuRvFmI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 908018010,
+          "mode": "list",
+          "cachedResultName": "SETTINGS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17TWo3sVU8EYnVHxydD-crZQ-6dIwYhdtPM2CsuRvFmI/edit#gid=908018010"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        0
+      ],
+      "id": "bb7e0f7d-4921-4cf7-9504-b0007802f5a0",
+      "name": "Read BotID",
+      "credentials": {
+        "googleApi": {
+          "id": "Uj7jHv5GKpDrpobU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dd194f74-2819-4b3e-91a6-1d9697057eec",
+      "name": "Timer 15s"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get new message": {
+      "main": [
+        [
+          {
+            "node": "Extract text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Test Data Teble": {
+      "main": [
+        [
+          {
+            "node": "Get new message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract text": {
+      "main": [
+        [
+          {
+            "node": "Read BotID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send To Bot": {
+      "main": [
+        [
+          {
+            "node": "Add SENDED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add SENDED": {
+      "main": [
+        [
+          {
+            "node": "Update Test Data Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read BotID": {
+      "main": [
+        [
+          {
+            "node": "Send To Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Timer 15s": {
+      "main": [
+        [
+          {
+            "node": "Read Test Data Teble",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4729705d-ee07-4df4-8a23-384d4fa9d012",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a20f8f51604ee5052ef776f35f47f2cf0ff35337ce1382253e39c27f8d9c2f97"
+  },
+  "id": "cFxxCGtq75hIZPoE",
+  "tags": []
+}
