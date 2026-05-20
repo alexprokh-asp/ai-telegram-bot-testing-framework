@@ -1,6 +1,5 @@
 # Telegram Bot QA Automation System (n8n + AI + Google Sheets)
 
-https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
 
 ## Problem Statement (Motivation)
 
