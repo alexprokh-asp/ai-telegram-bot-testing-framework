@@ -3,9 +3,7 @@
 
 ## Problem Statement (Motivation)
 
-## 🎥 Demo
-https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
-
+## 🎥 Demo https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
 
 A typical QA cycle looks like this:
 - prepare a list of test questions
