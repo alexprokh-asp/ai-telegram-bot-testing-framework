@@ -1,8 +1,11 @@
 # Telegram Bot QA Automation System (n8n + AI + Google Sheets)
 
+https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
+
 ## Problem Statement (Motivation)
 
-Manually testing a chatbot requires repeatedly sending messages in Telegram, waiting for responses, comparing them with expected behavior, and logging results.
+Telegram Bot QA Automation System demo: https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
+
 
 A typical QA cycle looks like this:
 - prepare a list of test questions
