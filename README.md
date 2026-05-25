@@ -6,7 +6,7 @@
 ## 🎥 Demo
 https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
 
-## 📸 System Overview v1 + v2 (with Jira issue creation and Bug Report review)
+## 📸 System Overview
 ![Architecture](example/n8n_flow.jpg)
 
 A typical QA cycle looks like this:
