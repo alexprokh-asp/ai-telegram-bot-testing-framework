@@ -6,6 +6,9 @@
 ## 🎥 Demo
 https://drive.google.com/file/d/1Br658t0SE8S6YSriAlbGLpmBbxFa3DxH/view?usp=drive_link
 
+## 📸 System Overview v1 + v2 (with Jira issue creation and Bug Report review)
+![Architecture](example/n8n_flow.jpg)
+
 A typical QA cycle looks like this:
 - prepare a list of test questions
 - manually send each message to the bot in Telegram
